@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logger()
+builder.Logger(builder.Configuration)
     .Database(builder.Configuration)
     .Repositories()
     .Services()
@@ -48,5 +48,6 @@ app.UseHttpsRedirection();
 app.MapControllers();
 app.Middlewares();
 app.AutoMigrations();
+app.Metrics();
 
 app.Run();
