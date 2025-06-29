@@ -1,0 +1,44 @@
+version: '3.8'
+
+networks:
+  observability-net:
+    external: true
+
+services:
+  api:
+    container_name: api
+    image: aspnet-task-api-image
+    ports:
+      - "5000:80"
+    networks:
+      - observability-net
+
+  prometheus:
+    container_name: prometheus
+    image: docker.io/prom/prometheus
+    networks:
+      - observability-net
+    volumes:
+          - type: bind
+            source: ./prometheus.yml
+            target: /etc/prometheus/prometheus.yml
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus"]
+
+  loki:
+    container_name: loki
+    image: docker.io/grafana/loki:latest
+    networks:
+      - observability-net
+
+  grafana:
+    container_name: grafana
+    image: docker.io/grafana/grafana-oss
+    ports:
+      - "3000:3000"
+    networks:
+      - observability-net
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+volumes:
+  grafana-storage: {}
