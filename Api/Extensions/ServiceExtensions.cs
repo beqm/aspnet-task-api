@@ -5,6 +5,7 @@ using FluentValidation;
 using Domain.Interfaces;
 using Infrastructure.Services;
 using Infrastructure.Persistence;
+using Serilog.Sinks.Grafana.Loki;
 using Application.Common.Mappings;
 using Application.Common.Behaviors;
 using Microsoft.EntityFrameworkCore;
@@ -16,21 +17,28 @@ namespace Api.Extensions;
 
 public static class ServiceExtensions
 {
-    public static WebApplicationBuilder Logger(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder Logger(this WebApplicationBuilder builder, IConfiguration configuration)
     {
-        string outputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u4}] {Message:lj}{NewLine}{Exception}";
+        Serilog.Debugging.SelfLog.Enable(Console.Error);
+        var lokiUrl = configuration["Loki:Url"] ?? "";
+        var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
+        var outputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u4}] {Message}{NewLine}{Exception}";
+
+        var labels = new List<LokiLabel>
+        {
+            new LokiLabel { Key = "app", Value = "aspnet-task-api" },
+            new LokiLabel { Key = "env", Value = environmentName }
+        };
 
         Log.Logger = new LoggerConfiguration()
-            .WriteTo.Console(outputTemplate: outputTemplate)
-            .WriteTo.File(
-                path: "../logs/.txt",
-                rollingInterval: RollingInterval.Day,
-                outputTemplate: outputTemplate,
-                retainedFileCountLimit: 7
-            )
             .MinimumLevel.Information()
+            .WriteTo.Console(outputTemplate: outputTemplate)
+            .WriteTo.GrafanaLoki(
+                uri: lokiUrl,
+                labels: labels
+            )
             .CreateLogger();
-
+            
         builder.Host.UseSerilog();
         return builder;
     }
