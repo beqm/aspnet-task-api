@@ -1,3 +1,4 @@
+using Prometheus;
 using Api.Middleware;
 using Scalar.AspNetCore;
 using Infrastructure.Persistence;
@@ -32,6 +33,13 @@ public static class AppExtensions
 
         return app;
     }
-    
 
+    public static WebApplication Metrics(this WebApplication app)
+    {
+        app.UseHttpMetrics();
+        app.MapMetrics();
+        app.MapControllers();
+
+        return app;
+    }
 }
