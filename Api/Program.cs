@@ -47,5 +47,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Middlewares();
+app.AutoMigrations();
 
 app.Run();
