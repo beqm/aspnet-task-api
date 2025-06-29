@@ -79,24 +79,17 @@ Make sure you run this command from the root directory of the project, where the
 
 This command will create the container image named aspnet-task-api.
 
-### **2. Create a pod**
+### **2. Starting the Pod with Podman-Compose**
 
 ```bash
-    podman pod create --name aspnet-task-api-pod -p 5000:80
+    podman-compose up -d
 ```
 
-This command will create a pod named aspnet-task-api-pod and map port 5000 on your host to port 80 in the pod.
-
-### **3. Start the container**
-
-```bash
-    podman run -d --name api --pod aspnet-task-api-pod aspnet-task-api-image
-```
-
-This command will start a container named api inside the pod, using the previously built image.
+This command will create the pod containing all necessary containers.
 
 ### **4. Access the application**
 Once the container is running, you can access:
 
 - [Scalar](http://localhost:5000/scalar/)
 - [Swagger](http://localhost:5000/swagger/index.html)
+- [Grafana](http://localhost:3000/login)
