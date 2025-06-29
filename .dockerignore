@@ -1,0 +1,12 @@
+bin/
+obj/
+logs/
+*.md
+*.git
+*.vs
+.gitignore
+Dockerfile
+sqlite.db
+sqlite.db-shm
+sqlite.db-wal
+
