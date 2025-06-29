@@ -4,12 +4,14 @@ using System.Text;
 using FluentValidation;
 using Domain.Interfaces;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Mvc;
 using Infrastructure.Persistence;
 using Serilog.Sinks.Grafana.Loki;
 using Application.Common.Mappings;
 using Application.Common.Behaviors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Application.Commands.Task.CreateTask;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
@@ -38,7 +40,7 @@ public static class ServiceExtensions
                 labels: labels
             )
             .CreateLogger();
-            
+
         builder.Host.UseSerilog();
         return builder;
     }
@@ -139,6 +141,28 @@ public static class ServiceExtensions
 
         builder.Services.AddAuthorization();
 
+        return builder;
+    }
+
+    public static WebApplicationBuilder Versioning(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+            options.ApiVersionReader = ApiVersionReader.Combine(
+                new UrlSegmentApiVersionReader(),
+                new HeaderApiVersionReader("x-api-version"),
+                new QueryStringApiVersionReader("api-version")
+            );
+        });
+
+        builder.Services.AddVersionedApiExplorer(options =>
+        {
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+        });
         return builder;
     }
 
