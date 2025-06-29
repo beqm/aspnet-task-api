@@ -66,3 +66,37 @@ This command will build and run the API.
 - [Swagger](http://localhost:5148/swagger/index.html)
 
 Feel free to explore the project structure to understand how the various layers (e.g., Domain, Application, Infrastructure, API) interact within the principles of hexagonal architecture.
+
+## 🐳 **Running inside a pod**
+If you prefer to run the application inside a container using Podman, follow these steps:
+
+### **1. Build the Docker/Podman image**
+Make sure you run this command from the root directory of the project, where the Dockerfile is located:
+
+```bash
+    podman build -t aspnet-task-api-image .
+```
+
+This command will create the container image named aspnet-task-api.
+
+### **2. Create a pod**
+
+```bash
+    podman pod create --name aspnet-task-api-pod -p 5000:80
+```
+
+This command will create a pod named aspnet-task-api-pod and map port 5000 on your host to port 80 in the pod.
+
+### **3. Start the container**
+
+```bash
+    podman run -d --name api --pod aspnet-task-api-pod aspnet-task-api-image
+```
+
+This command will start a container named api inside the pod, using the previously built image.
+
+### **4. Access the application**
+Once the container is running, you can access:
+
+- [Scalar](http://localhost:5000/scalar/)
+- [Swagger](http://localhost:5000/swagger/index.html)
